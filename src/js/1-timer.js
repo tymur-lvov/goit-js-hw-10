@@ -1,9 +1,15 @@
 import flatpickr from 'flatpickr';
+import iziToast from 'izitoast';
 import 'flatpickr/dist/flatpickr.min.css';
+import 'izitoast/dist/css/iziToast.min.css';
 
 const elements = {
   dateInput: document.querySelector('#datetime-picker'),
   startButton: document.querySelector('[data-start]'),
+  daysValue: document.querySelector('[data-days]'),
+  hoursValue: document.querySelector('[data-hours'),
+  minutesValue: document.querySelector('[data-minutes'),
+  secondsValue: document.querySelector('[data-seconds'),
 };
 
 const options = {
@@ -15,38 +21,64 @@ const options = {
 
 const datePicker = flatpickr(elements.dateInput, options);
 
-let userSelectedDate;
+let userSelectedTime;
 
 function setTimer(selectedDates) {
   if (selectedDates[0].getTime() > Date.now()) {
     elements.startButton.removeAttribute('disabled');
-    userSelectedDate = selectedDates[0];
-    console.log(userSelectedDate.getTime() - Date.now());
+
+    userSelectedTime = selectedDates[0].getTime() - Date.now();
   } else {
     elements.startButton.setAttribute('disabled', '');
-    alert('Please choose a date in the future');
+
+    iziToast.show({
+      message: 'Please choose a date in the future',
+      messageColor: '#fff',
+      backgroundColor: '#ff3333',
+      position: 'topRight',
+    });
   }
 }
 
 datePicker.config.onClose.push(setTimer);
 
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
 
-  // Remaining days
   const days = Math.floor(ms / day);
-  // Remaining hours
   const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
   const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
 }
 
-console.log(convertMs(82611693));
+function addLeadingZero(timeValue) {
+  if (timeValue < 10) {
+    return timeValue.toString().padStart(2, '0');
+  }
+  return timeValue;
+}
+
+elements.startButton.addEventListener('click', () => {
+  elements.startButton.setAttribute('disabled', '');
+  elements.dateInput.setAttribute('disabled', '');
+
+  setInterval(() => {
+    const currentTimerValue = convertMs(userSelectedTime);
+
+    elements.daysValue.textContent = addLeadingZero(currentTimerValue.days);
+    elements.hoursValue.textContent = addLeadingZero(currentTimerValue.hours);
+    elements.minutesValue.textContent = addLeadingZero(
+      currentTimerValue.minutes
+    );
+    elements.secondsValue.textContent = addLeadingZero(
+      currentTimerValue.seconds
+    );
+
+    userSelectedTime -= 1000;
+  }, 1000);
+});

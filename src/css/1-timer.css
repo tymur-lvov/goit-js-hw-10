@@ -28,10 +28,11 @@ input {
 input:disabled {
     background-color: #fafafa;
     color: #808080;
+
 }
 
-input:active {
-    border: 1px solid #4e75ff;
+input:focus {
+    border-color: #4e75ff;
 }
 
 button {
