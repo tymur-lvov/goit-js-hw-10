@@ -67,7 +67,7 @@ elements.startButton.addEventListener('click', () => {
   elements.startButton.setAttribute('disabled', '');
   elements.dateInput.setAttribute('disabled', '');
 
-  setInterval(() => {
+  const timerInterval = setInterval(() => {
     const currentTimerValue = convertMs(userSelectedTime);
 
     elements.daysValue.textContent = addLeadingZero(currentTimerValue.days);
@@ -80,5 +80,14 @@ elements.startButton.addEventListener('click', () => {
     );
 
     userSelectedTime -= 1000;
+
+    if (
+      elements.daysValue.textContent === '00' &&
+      elements.hoursValue.textContent === '00' &&
+      elements.minutesValue.textContent === '00' &&
+      elements.secondsValue.textContent === '00'
+    ) {
+      clearInterval(timerInterval);
+    }
   }, 1000);
 });
